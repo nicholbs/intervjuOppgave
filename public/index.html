@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Isak CSS -->
+    <link rel="stylesheet" href="./CSS/search.css">
+</head>
+<body style="font-family: sans-serif;">
+    <script>
+ window.MyAppGlobals = {
+            rootPath: '/',
+            serverURL: 'http://localhost:8080/'
+            // serverURL: 'http://localhost:8000/'
+};
+
+var skille1 = document.createElement('div');
+skille1.innerHTML = "----------forste oppgave----------------"
+document.body.appendChild(skille1);
+
+/* make json answer from web request into table on website */
+var button = document.createElement('button');
+button.innerHTML = 'List ut produksjonsplassene fra endepunktet http://localhost:5000/produksjonsplass';
+button.onclick = function() {
+  var request = new XMLHttpRequest();
+ 
+  request.open('GET', 'http://localhost:5000/produksjonsplass', true);
+  request.onload = function() {
+    if (request.status >= 200 && request.status < 400) {
+      // Success!
+      var resp = request.responseText;
+    //   console.log(resp);
+      var table = document.createElement('table');
+
+
+      var row = document.createElement('tr');
+      cell = document.createElement('th');
+      cell.innerHTML = "produksjonsplassid";
+      row.appendChild(cell);
+
+      cell = document.createElement('th');
+      cell.innerHTML = "kommunenummer";
+      row.appendChild(cell);
+      
+      cell = document.createElement('th');
+      cell.innerHTML = "gaardsnummer";
+      row.appendChild(cell);
+      
+      cell = document.createElement('th');
+      cell.innerHTML = "bruksnummer";
+      row.appendChild(cell);
+      
+      
+      cell = document.createElement('th');
+      cell.innerHTML = "bygningsnummer";
+      row.appendChild(cell);
+      
+      cell = document.createElement('th');
+      cell.innerHTML = "koordinater";
+      row.appendChild(cell);
+
+      cell = document.createElement('th');
+      cell.innerHTML = "Utdrag fra norgeskart.no";
+      row.appendChild(cell);
+      
+      table.appendChild(row);
+      var json = JSON.parse(resp);
+      for (var i = 0; i < json.length; i++) {
+        // console.log(json.)
+        row = document.createElement('tr');
+        // var row = document.createElement('tr');
+        cell = document.createElement('td');
+        // var cell = document.createElement('td');
+        // produksjonsplassid
+        cell.innerHTML = json[i].produksjonsplassid;
+        row.appendChild(cell);
+        // kommunenummer
+        cell = document.createElement('td');
+        cell.innerHTML = json[i].kommunenummer;
+        row.appendChild(cell);
+        // gaardsnummer
+        cell = document.createElement('td');
+        cell.innerHTML = json[i].gaardsnummer;
+        row.appendChild(cell);
+        // gaardsnummer
+        cell = document.createElement('td');
+        cell.innerHTML = json[i].bruksnummer;
+        row.appendChild(cell);
+        // gaardsnummer
+        cell = document.createElement('td');
+        cell.innerHTML = json[i].bygningsnummer;
+        row.appendChild(cell);
+        // gaardsnummer
+        cell = document.createElement('td');
+        var coordObj = JSON.parse(json[i].koordinater)
+      console.log("coord.crs.properties: " + coordObj)
+        if(coordObj == null) {
+          cell.innerHTML = "Mangler koordinater";
+        } else {
+          // let arr = String(coordObj.coordinates).split(",")
+          cell.innerHTML = coordObj.coordinates;
+        }
+        row.appendChild(cell);
+        
+        cell = document.createElement('img');
+        cell.setAttribute("src", `./photos/${i}.png`)
+        cell.setAttribute("width", `60%`)
+        cell.setAttribute("height", `60%`)
+        cell.setAttribute("alt", `Beklager, koordinatene var ikke tilgjengelig til å hente et bilde fra!`)
+        row.appendChild(cell);
+        
+        table.appendChild(row);
+      }
+    
+    //   document.body.appendChild(table);          Kan gjøre at denne laster opp en "loading time"
+
+
+    // fetch(`${window.MyAppGlobals.serverURL}norgesKart`, {
+    //         headers: { 'Content-type': 'application/json' },
+    //         method: 'POST',
+    //         body: JSON.stringify({
+    //             // artist: this.sang.artist,
+    //             songName: "this.sang.sang",
+    //             url: "this.sang.url"
+    //         })
+    //     })
+      console.log("Json.stringify: " + JSON.stringify(request.responseText))
+      console.log("Json.parse: " + JSON.parse(resp))
+      var testinger = JSON.parse(resp)
+      console.log("Json.string obj: " + JSON.stringify(testinger))
+    fetch(`${window.MyAppGlobals.serverURL}norgesKart`, {
+            headers: { 'Content-type': 'application/json' },
+            method: 'POST',
+            body: JSON.stringify(testinger)
+        })
+
+    //   var requestApi = new XMLHttpRequest();
+      console.log(`Sent request to ${window.MyAppGlobals.serverURL}norgesKart`)
+    //   requestApi.open('POST', `${window.MyAppGlobals.serverURL}norgesKart`, true)
+    //   requestApi.setRequestHeader("Content-Type", "application/json");
+    //   requestApi.send(JSON.stringify(request.responseText));
+      document.body.insertBefore(table, skille1);
+
+    } else {
+      // We reached our target server, but it returned an error
+      console.log('error');
+    }
+  };
+  request.onerror = function() {
+    // There was a connection error of some sort
+    console.log('connection error');
+  };
+ 
+  request.send();
+  
+};
+document.body.appendChild(button);
+
+// var button2 = document.createElement('button');
+// button2.innerHTML = '';
+// button2.onclick = function() {}
+// document.body.appendChild(button2);
+
+
+var skille = document.createElement('div');
+skille.innerHTML = "----------andre oppgave----------------"
+document.body.appendChild(skille);
+
+
+
+/* append input types to form from array */
+var form = document.createElement('form');
+
+form.onsubmit = function() {
+  console.log("Oppgave 2: send json data: ")
+  var individ = {};
+  for (var i = 0; i < this.elements.length; i++) {
+    if (this.elements[i].value == "Submit") {
+
+    } else {
+      console.log("for loop: " + this.elements[i].value)
+      individ[this.elements[i].name] = this.elements[i].value;
+    }
+  }
+
+  console.log("Individ: " + individ);
+  var tempor = JSON.stringify(individ)
+  console.log("Stringift: " + tempor)
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'http://localhost:5000/registrerforflytning', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(JSON.stringify(individ));
+  return false;
+};
+
+
+form.setAttribute('method', 'post');
+form.setAttribute('action', 'http://localhost:5000/produksjonsplass');
+
+var br = document.createElement('br');
+
+window.onload = function() {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'http://localhost:5000/produksjonsplass', true);
+  xhr.send();
+  xhr.onload = function() {
+
+    if (xhr.status >= 200 && xhr.status < 400) {
+      // Success!
+      var resp = xhr.responseText;
+      var json = JSON.parse(resp);
+      var inputs = [
+        {
+          "name": "dyreholdId",
+          "value": "dyreholdId-1"
+        },
+        {
+          "name": "dyreholdId",
+          "value": "dyreholdId-2"
+        },
+        {
+          "name": "dyreholdId",
+          "value": "dyreholdId-3"
+        },
+        {
+          "name": "dyreholdId",
+          "value": "dyreholdId-4"
+        }
+      ];
+
+      var textPlass = document.createElement('div');
+      textPlass.innerHTML = "* velg dyrets ID:"
+      form.appendChild(textPlass);
+
+      for (var i = 0; i < inputs.length; i++) {
+        var input = document.createElement('input');
+        input.setAttribute('type', 'radio');
+        input.setAttribute('name', inputs[i].name);
+        input.setAttribute('value', inputs[i].value);
+        var label = document.createElement('label');
+        label.innerHTML = inputs[i].value
+        form.appendChild(input);
+        form.appendChild(label);
+      }
+
+      var brInput = document.createElement('br');
+      form.appendChild(brInput);
+
+      
+      var textIndivid = document.createElement('div');
+      textIndivid.innerHTML = "* Skriv individnummer i format [number, number]:"
+      form.appendChild(textIndivid);
+
+      var inputIndivid = document.createElement('input');
+      inputIndivid.setAttribute('type', 'text');
+      inputIndivid.setAttribute('name', "individ");
+      inputIndivid.setAttribute('value', "[1,2]");
+      form.appendChild(inputIndivid);
+      
+      form.appendChild(brInput);
+
+
+            
+      var textPlass = document.createElement('div');
+      textPlass.innerHTML = "* velg produksjonsplassId:"
+      form.appendChild(textPlass);
+      
+      for (var i = 0; i < json.length; i++) {
+          var input = document.createElement('input');
+          input.setAttribute('type', 'radio');
+          input.setAttribute('name', "produksjonsplassId");
+          input.setAttribute('value', json[i].produksjonsplassid);
+          form.appendChild(input);
+          var label = document.createElement('label');
+          label.innerHTML = json[i].produksjonsplassid
+          // var brInput = document.createElement('br');
+          form.appendChild(label);
+          // form.appendChild(brInput);
+          // var brInput = document.c
+      }
+
+      
+    
+      //   console.log(resp);
+    }
+  }
+};
+
+var submit = document.createElement('input');
+form.appendChild(submit);
+form.appendChild(br);
+submit.setAttribute('type', 'submit');
+submit.setAttribute('value', 'Submit');
+document.body.appendChild(form);
+// /* make json answer from web request into table on website */
+// var button = document.createElement('button');
+// button.innerHTML = 'Send Web Request';
+// button.onclick = function() {
+//   var request = new XMLHttpRequest();
+//   request.open('POST', 'http://localhost:5000/registreringsforflytning', true);
+//   request.onload = function() {
+//     if (request.status >= 200 && request.status < 400) {
+//       // Success!
+//       var resp = request.responseText;
+//       console.log(resp);
+//       var table = document.createElement('table');
+//       var json = JSON.parse(resp);
+//       for (var i = 0; i < json.length; i++) {
+//         // console.log(json.)
+//         var row = document.createElement('tr');
+//         var cell = document.createElement('td');
+//         // produksjonsplassid
+//         cell.innerHTML = json[i].produksjonsplassid;
+//         row.appendChild(cell);
+//         // kommunenummer
+//         cell = document.createElement('td');
+//         cell.innerHTML = json[i].kommunenummer;
+//         row.appendChild(cell);
+//         // gaardsnummer
+//         cell = document.createElement('td');
+//         cell.innerHTML = json[i].gaardsnummer;
+//         row.appendChild(cell);
+//         // gaardsnummer
+//         cell = document.createElement('td');
+//         cell.innerHTML = json[i].bruksnummer;
+//         row.appendChild(cell);
+//         // gaardsnummer
+//         cell = document.createElement('td');
+//         cell.innerHTML = json[i].bygningsnummer;
+//         row.appendChild(cell);
+//         // gaardsnummer
+//         cell = document.createElement('td');
+//         cell.innerHTML = json[i].koordinater;
+//         row.appendChild(cell);
+//         table.appendChild(row);
+//       }
+//       document.body.appendChild(table);
+//     } else {
+//       // We reached our target server, but it returned an error
+//       console.log('error');
+//     }
+//   };
+//   request.onerror = function() {
+//     // There was a connection error of some sort
+//     console.log('connection error');
+//   };
+//   request.send();
+// };
+// document.body.appendChild(button);
+
+
+
+
+    </script>
+</body>
+<!-- <form action="http://localhost:5000/produksjonsplass" method="post">
+  <input type="text" name="ID" value="1..X" />
+  <input type="number" name="individ" value="X" />
+  <input type="number" name="individ" value="Y" />
+  <input type="text" name="produksjonsplassId" value="100xxx" />
+  <input type="submit" value="Submit" />
+</form>
+
+
+/* form with three inputs, the last two are from four alternatives */
+<form action="http://localhost:8080/post" method="post">
+  <input type="radio" name="dyreholdID" value="DyreholdID-valg1"> DyreholdID-valg1 <br>
+  <input type="radio" name="dyreholdID" value="DyreholdID-valg2"> DyreholdID-valg2 <br>
+  <input type="radio" name="dyreholdID" value="DyreholdID-valg3"> DyreholdID-valg3 <br>
+  <input type="radio" name="dyreholdID" value="DyreholdID-valg4"> DyreholdID-valg4 <br>
+  <input type="text" name="individ[0]" value="1" />
+  <input type="text" name="individ[1]" value="2" /> <br>
+  <input type="radio" name="gender" value="male" checked> Male<br>
+  <input type="radio" name="gender" value="female"> Female<br>
+  <input type="radio" name="gender" value="other"> Other<br>
+  <input type="radio" name="gender" value="prefer not to say"> Prefer not to say<br>
+  <input type="submit" value="Submit" />
+</form> -->
+</html>
